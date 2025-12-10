@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Landing Zone Service Catalog</title>
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <!-- js-yaml -->
+  <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+
+  <style>
+    :root{
+      --bg:#0f1724;
+      --card:#0b1220;
+      --muted:#9aa4b2;
+      --accent:#0078d4;
+      --tile-radius:8px;
+      --tile-gap:10px;
+    }
+    body{font-family:Inter,system-ui,Segoe UI,Helvetica,Arial;background:#0f1724;color:#e6eef6;padding:20px}
+    .hero{display:flex;gap:20px;align-items:center;margin-bottom:20px}
+    .logo {
+        width:48px;
+        height:48px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        background:none !important;
+        border-radius:0 !important;
+        padding:0;
+    }
+
+    .panel { background: linear-gradient(180deg,#071129,#0b1220); border-radius:12px; padding:18px; box-shadow:0 8px 30px rgba(2,6,23,0.7); }
+    .muted { color:var(--muted); }
+    .tile-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: var(--tile-gap); }
+    .group-title { font-weight:600; color:#cfe7ff; margin-bottom:8px; font-size:14px }
+    .tile {
+      background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+      border-radius:var(--tile-radius);
+      padding:12px;
+      min-height:90px;
+      transition: transform .14s ease, box-shadow .14s ease, opacity .2s ease, filter .2s ease;
+      cursor: pointer;
+      border: 1px solid rgba(255,255,255,0.03);
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+    }
+    .tile:hover { transform: translateY(-6px); box-shadow: 0 10px 30px rgba(2,6,23,0.6); }
+    .tile .k { font-size:20px; font-weight:700; }
+    .tile .v { font-size:12px; color:var(--muted) }
+    .tag { font-size:11px; padding:6px 8px; border-radius:999px; background:rgba(255,255,255,0.03); color: #cfe7ff; display:inline-block }
+    .accent { color:var(--accent) }
+    .controls { display:flex; gap:8px; align-items:center; }
+    .searchbox { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.03); color: #e6eef6; padding:8px 12px; border-radius:8px }
+    .legend { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px }
+    .legend .mini { padding:6px 10px; border-radius:8px; font-size:12px; cursor:pointer; transition: all .2s; }
+    .legend .mini.active { border:1px solid var(--accent); background: rgba(0,120,212,0.3); }
+
+    /* colors */
+    .c-core { background: linear-gradient(180deg,#082a3a,#052330) }
+    .c-security { background: linear-gradient(180deg,#3b1352,#2b0b3b) }
+    .c-observ { background: linear-gradient(180deg,#123a0f,#0b290a) }
+    .c-diagnostics { background: linear-gradient(180deg,#623214,#3a1b0d) }
+    .c-workload { background: linear-gradient(180deg,#0b386e,#03234a) }
+    .c-governance { background: linear-gradient(180deg, #2f3a0d, #1f2609); }
+
+    /* modal code area */
+    pre.yaml { background:#071127; color:#cfe7ff; padding:12px; border-radius:8px; overflow:auto; max-height:240px }
+    .diagram { font-family: monospace; background: linear-gradient(180deg,#021224,#00121a); padding:12px;border-radius:8px;color:#bfe9ff }
+    /* responsive */
+    @media (max-width:720px){ .hero{flex-direction:column; align-items:flex-start} }
+  </style>
+</head>
+<body>
+
+  <div class="hero">
+      <div class="logo">
+        <img src="img/Azure-icon.svg" alt="Azure" style="width:48px;height:48px;">
+      </div>
+    <div>
+      <h2 style="margin:0">Cloud Architecture Deployment Solution</h2>
+      <div class="muted">Landing zone models that give you clarity and confidence</div>
+    </div>
+    <div style="margin-left:auto" class="controls">
+      <input type="file" id="yamlFile" accept=".yaml,.yml" />
+      <button id="loadSample" class="btn btn-sm btn-outline-light">Load sample S1</button>
+      <button id="printBtn" class="btn btn-sm btn-light">Export / Print</button>
+    </div>
+  </div>
+
+  <div class="panel mb-3">
+    <div class="row">
+      <div class="col-md-8">
+        <div class="d-flex align-items-center gap-2">
+          <div style="width:48px;height:48px;border-radius:8px;background:#061428;display:flex;align-items:center;justify-content:center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M3 12h18" stroke="#7fd1ff" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+          <div>
+            <div style="font-weight:600">Blueprint summary</div>
+            <div class="muted small" id="summaryLine">No YAML loaded — drop S1/S2 YAML or click 'Load sample S1'</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 text-md-end muted">
+        <div>Categories</div>
+        <div class="legend">
+          <div class="mini c-core" data-group="core">Landing Zone Core</div>
+          <div class="mini c-security" data-group="security">Security Boundary</div>
+          <div class="mini c-observ" data-group="observ">Observability</div>
+          <div class="mini c-diagnostics" data-group="diagnostics">Diagnostics</div>
+          <div class="mini c-workload" data-group="workload">Workload Layer</div>
+          <div class="mini c-governance" data-group="governance">Governance & Compliance</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- grid groups -->
+  <div class="row g-3">
+    <div class="col-12 col-md-6 d-flex flex-column gap-3">
+      <div>
+        <div class="group-title">Observability & Dashboards</div>
+        <div id="group-observ" class="tile-grid"></div>
+      </div>
+      <div>
+        <div class="group-title">Workload Layer</div>
+        <div id="group-workload" class="tile-grid"></div>
+      </div>
+      <div>
+        <div class="group-title">Landing Zone Core</div>
+        <div id="group-core" class="tile-grid"></div>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-6 d-flex flex-column gap-3">
+      <div>
+        <div class="group-title">Security Boundary</div>
+        <div id="group-security" class="tile-grid"></div>
+      </div>
+      <div>
+        <div class="group-title">Diagnostics & Traffic Analytics</div>
+        <div id="group-diagnostics" class="tile-grid"></div>
+      </div>
+      <div>
+        <div class="group-title">Governance & Compliance</div>
+        <div id="group-governance" class="tile-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <hr style="margin:28px 0;border-color: rgba(255,255,255,0.04)"/>
+
+  <div class="panel">
+    <div style="display:flex;gap:12px;align-items:center">
+      <div style="flex:1">
+        <div style="font-weight:600">Tile details & Sales Script</div>
+        <div class="muted small">Click a tile to view its YAML-driven details and a short sales script you can read verbatim to customers.</div>
+      </div>
+      <div style="margin-left:auto">
+        <button class="btn btn-sm btn-outline-light" id="expandAllBtn">Expand all (modals)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal fade" id="tileModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+      <div class="modal-content bg-dark text-light">
+        <div class="modal-header border-0">
+          <h5 id="modalTitle" class="modal-title"></h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div id="modalDesc" class="mb-3 muted"></div>
+              <div class="mb-3"><strong>Value to customer</strong><div id="modalValue" class="muted small"></div></div>
+              <div><strong>YAML Details (if present)</strong></div>
+              <pre id="modalYaml" class="yaml"></pre>
+            </div>
+            <div class="col-md-6">
+              <div><strong>How workloads are deployed on top</strong></div>
+              <div id="modalDiagram" class="diagram mt-2"></div>
+              <div class="mt-3"><strong>Sales Script (read aloud)</strong><div id="modalScript" class="muted small mt-2"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+(() => {
+  if (!window.bootstrap) console.error("Bootstrap failed to load. Modals will not work.");
+
+  const CATALOG = {
+    vnet:{title:'Virtual Network (VNet)',group:'core',cls:'c-core',desc:'Primary VNet that contains subnets.',value:'Network segmentation.'},
+    subnets:{title:'Subnets',group:'core',cls:'c-core',desc:'Isolated subnets per function.',value:'Separation of concerns.'},
+    resource_groups:{title:'Resource Groups',group:'core',cls:'c-core',desc:'Logical containers.',value:'RBAC + lifecycle.'},
+    nsg:{title:'Network Security Group',group:'security',cls:'c-security',desc:'Access control rules.',value:'Packet filtering.'},
+    nsp:{title:'Network Security Perimeter',group:'security',cls:'c-security',desc:'Private PaaS boundary.',value:'Governed perimeters.'},
+    law:{title:'Log Analytics Workspace',group:'observ',cls:'c-observ',desc:'Central log workspace.',value:'Unified telemetry.'},
+    dashboards:{title:'Dashboards',group:'observ',cls:'c-observ',desc:'Visual monitoring.',value:'Insights.'},
+    diagnostics:{title:'Diagnostics Settings',group:'diagnostics',cls:'c-diagnostics',desc:'Traffic, logs, flows.',value:'Auditing + visibility.'},
+    flow_logs:{title:'Flow Logs',group:'diagnostics',cls:'c-diagnostics',desc:'Network watcher flow logs.',value:'Traffic visibility.'},
+    vm:{title:'Virtual Machines',group:'workload',cls:'c-workload',desc:'Compute workloads.',value:'Full control.'},
+    app_service:{title:'App Service',group:'workload',cls:'c-workload',desc:'PaaS hosting.',value:'Scaling + integration.'},
+    storage:{title:'Storage',group:'workload',cls:'c-workload',desc:'Blob/file storage.',value:'Durable data.'},
+    governance_policy:{title:'Azure Policy',group:'governance',cls:'c-governance',desc:'Enforce organizational compliance',value:'Ensure standards and compliance.'},
+    alerts:{title:'Alerts & Action Groups',group:'governance',cls:'c-governance',desc:'Configure monitoring alerts and notifications',value:'Detect and respond to issues proactively.'}
+  };
+
+  let modalEl = window.bootstrap?.Modal ? new bootstrap.Modal(document.getElementById('tileModal')) : null;
+
+  function showModal(key, meta){
+    if(!modalEl) return alert("Bootstrap modal unavailable.");
+    document.getElementById('modalTitle').textContent = meta.title;
+    document.getElementById('modalDesc').textContent = meta.desc;
+    document.getElementById('modalValue').textContent = meta.value;
+    document.getElementById('modalYaml').textContent = loadedYamlString || "No YAML loaded";
+    document.getElementById('modalDiagram').textContent = "Workload > Subnets > LZ > NSP > LAW";
+    document.getElementById('modalScript').textContent = `${meta.title} helps customers because ${meta.value.toLowerCase()}.`;
+    modalEl.show();
+  }
+
+  function makeTile(key, meta, badge){
+    const el = document.createElement("div");
+    el.className = "tile "+meta.cls;
+    el.innerHTML = `<div><div class="k">${meta.title}</div><div class="v">${meta.desc}</div></div><div class="tag">${badge||""}</div>`;
+    el.addEventListener("click",()=>showModal(key,meta));
+    return el;
+  }
+
+  const groups = {
+    core:document.getElementById("group-core"),
+    security:document.getElementById("group-security"),
+    observ:document.getElementById("group-observ"),
+    diagnostics:document.getElementById("group-diagnostics"),
+    workload:document.getElementById("group-workload"),
+    governance:document.getElementById("group-governance")
+  };
+
+  function populateTiles(badges={}) {
+    Object.values(groups).forEach(g=>g.innerHTML="");
+    Object.entries(CATALOG).forEach(([k,m])=>{
+      const tile = makeTile(k,m,badges[k]);
+      groups[m.group].appendChild(tile);
+    });
+  }
+
+  // CATEGORY FILTERING
+  const legendItems = document.querySelectorAll(".legend .mini");
+  legendItems.forEach(item=>{
+    item.addEventListener("click",()=>{
+      const group = item.dataset.group;
+      const allTiles = document.querySelectorAll(".tile");
+      const isActive = item.classList.contains("active");
+      legendItems.forEach(i=>i.classList.remove("active"));
+      if(!isActive){
+        item.classList.add("active");
+        allTiles.forEach(tile=>{
+          if(tile.classList.contains("c-"+group)){
+            tile.style.opacity="1";
+            tile.style.filter="none";
+          }else{
+            tile.style.opacity="0.2";
+            tile.style.filter="grayscale(80%)";
+          }
+        });
+      }else{
+        allTiles.forEach(tile=>{tile.style.opacity="1"; tile.style.filter="none"});
+      }
+    });
+  });
+
+  let loadedYamlString="", loadedYaml=null;
+  function loadYamlText(text){
+    try{
+      const doc=jsyaml.load(text);
+      loadedYaml=doc;
+      loadedYamlString=text;
+      document.getElementById("summaryLine").textContent=`${doc.pattern_type?.toUpperCase()} — ${doc.purpose}`;
+      const badges={};
+      if(doc.vnets?.length) badges.vnet=doc.vnets.length;
+      if(doc.vnets?.[0]?.subnets) badges.subnets=doc.vnets[0].subnets.length;
+      if(doc.nsp) badges.nsp="configured";
+      if(doc.log_analytics_workspace) badges.law=doc.log_analytics_workspace;
+      if(doc.is_diagnostics_enabled) badges.diagnostics="on";
+      populateTiles(badges);
+    }catch(e){alert("YAML error: "+e.message);}
+  }
+
+  document.getElementById("yamlFile").addEventListener("change", async ev=>{const file=ev.target.files[0];if(file) loadYamlText(await file.text());});
+  document.getElementById("loadSample").addEventListener("click",()=>loadYamlText(sampleS1));
+
+  const sampleS1=`pattern_type: s1
+organization_name: demo
+region: westeurope
+vnets: [{name: main, cidr: 10.10.0.0/16, subnets:[{name:service,cidr:10.10.1.0/24}]}]
+nsp: main
+log_analytics_workspace: law-main
+is_diagnostics_enabled: yes`;
+
+  populateTiles();
+  loadYamlText(sampleS1);
+})();
+</script>
+
+</body>
+</html>
