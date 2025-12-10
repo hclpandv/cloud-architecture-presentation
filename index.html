@@ -99,7 +99,7 @@
     <div class="row">
       <div class="col-md-8">
         <div class="d-flex align-items-center gap-2">
-          <div style="width:48px;height:48px;border-radius:8px;background:#061428;display:flex;align-items:center;justify-content:center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M3 12h18" stroke="#7fd1ff" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+          <!-- <div style="width:48px;height:48px;border-radius:8px;background:#061428;display:flex;align-items:center;justify-content:center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M3 12h18" stroke="#7fd1ff" stroke-width="1.6" stroke-linecap="round"/></svg></div> -->
           <div>
             <div style="font-weight:600">Blueprint summary</div>
             <div class="muted small" id="summaryLine">No YAML loaded — drop S1/S2 YAML or click 'Load sample S1'</div>
@@ -203,21 +203,121 @@
   if (!window.bootstrap) console.error("Bootstrap failed to load. Modals will not work.");
 
   const CATALOG = {
-    vnet:{title:'Virtual Network (VNet)',group:'core',cls:'c-core',desc:'Primary VNet that contains subnets.',value:'Network segmentation.'},
-    subnets:{title:'Subnets',group:'core',cls:'c-core',desc:'Isolated subnets per function.',value:'Separation of concerns.'},
-    resource_groups:{title:'Resource Groups',group:'core',cls:'c-core',desc:'Logical containers.',value:'RBAC + lifecycle.'},
-    nsg:{title:'Network Security Group',group:'security',cls:'c-security',desc:'Access control rules.',value:'Packet filtering.'},
-    nsp:{title:'Network Security Perimeter',group:'security',cls:'c-security',desc:'Private PaaS boundary.',value:'Governed perimeters.'},
-    law:{title:'Log Analytics Workspace',group:'observ',cls:'c-observ',desc:'Central log workspace.',value:'Unified telemetry.'},
-    dashboards:{title:'Dashboards',group:'observ',cls:'c-observ',desc:'Visual monitoring.',value:'Insights.'},
-    diagnostics:{title:'Diagnostics Settings',group:'diagnostics',cls:'c-diagnostics',desc:'Traffic, logs, flows.',value:'Auditing + visibility.'},
-    flow_logs:{title:'Flow Logs',group:'diagnostics',cls:'c-diagnostics',desc:'Network watcher flow logs.',value:'Traffic visibility.'},
-    vm:{title:'Virtual Machines',group:'workload',cls:'c-workload',desc:'Compute workloads.',value:'Full control.'},
-    app_service:{title:'App Service',group:'workload',cls:'c-workload',desc:'PaaS hosting.',value:'Scaling + integration.'},
-    storage:{title:'Storage',group:'workload',cls:'c-workload',desc:'Blob/file storage.',value:'Durable data.'},
-    governance_policy:{title:'Azure Policy',group:'governance',cls:'c-governance',desc:'Enforce organizational compliance',value:'Ensure standards and compliance.'},
-    alerts:{title:'Alerts & Action Groups',group:'governance',cls:'c-governance',desc:'Configure monitoring alerts and notifications',value:'Detect and respond to issues proactively.'}
-  };
+    vnet: {
+      title: 'Virtual Network',
+      group: 'core',
+      cls: 'c-core',
+      desc: 'Primary VNet that contains subnets.',
+      value: 'Network segmentation.',
+      icon: 'img/vnet.svg'
+    },
+    subnets: {
+      title: 'Subnets',
+      group: 'core',
+      cls: 'c-core',
+      desc: 'Isolated subnets per function.',
+      value: 'Separation of concerns.',
+      icon: 'img/subnet.svg'
+    },
+    resource_groups: {
+      title: 'Resource Groups',
+      group: 'core',
+      cls: 'c-core',
+      desc: 'Logical containers.',
+      value: 'RBAC + lifecycle.',
+      icon: 'img/resource-group.svg'
+    },
+    nsg: {
+      title: 'Network Security Group',
+      group: 'security',
+      cls: 'c-security',
+      desc: 'Access control rules.',
+      value: 'Packet filtering.',
+      icon: 'img/nsg.svg'
+    },
+    nsp: {
+      title: 'Network Security Perimeter',
+      group: 'security',
+      cls: 'c-security',
+      desc: 'Private PaaS boundary.',
+      value: 'Governed perimeters.',
+      icon: 'img/nsp.svg'
+    },
+    law: {
+      title: 'Log Analytics Workspace',
+      group: 'observ',
+      cls: 'c-observ',
+      desc: 'Central log workspace.',
+      value: 'Unified telemetry.',
+      icon: 'img/law.svg'
+      
+    },
+    dashboards: {
+      title: 'Dashboards',
+      group: 'observ',
+      cls: 'c-observ',
+      desc: 'Visual monitoring.',
+      value: 'Insights.',
+      icon: 'img/dashboard.svg'
+    },
+    diagnostics: {
+      title: 'Diagnostics Settings',
+      group: 'diagnostics',
+      cls: 'c-diagnostics',
+      desc: 'Traffic, logs, flows.',
+      value: 'Auditing + visibility.',
+      icon: 'img/diagnostics.svg'
+    },
+    flow_logs: {
+      title: 'Flow Logs',
+      group: 'diagnostics',
+      cls: 'c-diagnostics',
+      desc: 'Network watcher flow logs.',
+      value: 'Traffic visibility.',
+      icon: 'img/network-watcher.svg'
+    },
+    vm: {
+      title: 'Virtual Machines',
+      group: 'workload',
+      cls: 'c-workload',
+      desc: 'Compute workloads.',
+      value: 'Full control.',
+      icon: 'img/vm.svg'
+    },
+    app_service: {
+      title: 'App Service',
+      group: 'workload',
+      cls: 'c-workload',
+      desc: 'PaaS hosting.',
+      value: 'Scaling + integration.',
+      icon: 'img/app-service.svg'
+    },
+    storage: {
+      title: 'Storage',
+      group: 'workload',
+      cls: 'c-workload',
+      desc: 'Blob/file storage.',
+      value: 'Durable data.',
+      icon: 'img/storage-account.svg'
+    },
+    governance_policy: {
+      title: 'Azure Policy',
+      group: 'governance',
+      cls: 'c-governance',
+      desc: 'Enforce organizational compliance',
+      value: 'Ensure standards and compliance.',
+      icon: 'img/policy.svg'
+    },
+    alerts: {
+      title: 'Alerts & Action Groups',
+      group: 'governance',
+      cls: 'c-governance',
+      desc: 'Configure monitoring alerts and notifications',
+      value: 'Detect and respond to issues proactively.',
+      icon: 'img/alerts.svg'
+    }
+};
+
 
   let modalEl = window.bootstrap?.Modal ? new bootstrap.Modal(document.getElementById('tileModal')) : null;
 
@@ -232,11 +332,20 @@
     modalEl.show();
   }
 
-  function makeTile(key, meta, badge){
+  function makeTile(key, meta, badge) {
     const el = document.createElement("div");
-    el.className = "tile "+meta.cls;
-    el.innerHTML = `<div><div class="k">${meta.title}</div><div class="v">${meta.desc}</div></div><div class="tag">${badge||""}</div>`;
-    el.addEventListener("click",()=>showModal(key,meta));
+    el.className = "tile " + meta.cls;
+
+    el.innerHTML = `
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+        ${meta.icon ? `<img src="${meta.icon}" alt="${meta.title}" style="width:24px;height:24px" onerror="this.style.display='none'">` : ''}
+        <div class="k">${meta.title}</div>
+      </div>
+      <div class="v">${meta.desc}</div>
+      <div class="tag">${badge || ""}</div>
+    `;
+
+    el.addEventListener("click", () => showModal(key, meta));
     return el;
   }
 
@@ -303,10 +412,11 @@
   document.getElementById("loadSample").addEventListener("click",()=>loadYamlText(sampleS1));
 
   const sampleS1=`pattern_type: s1
-organization_name: demo
+purpose: Minimal but secure Azure footprint for 1-2 compute components
+organization_name: vks
 region: westeurope
 vnets: [{name: main, cidr: 10.10.0.0/16, subnets:[{name:service,cidr:10.10.1.0/24}]}]
-nsp: main
+nsp: nsp-main
 log_analytics_workspace: law-main
 is_diagnostics_enabled: yes`;
 
