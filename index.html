@@ -172,9 +172,13 @@
     <div class="modal-dialog modal-xl modal-dialog-centered">
       <div class="modal-content bg-dark text-light">
         <div class="modal-header border-0">
-          <h5 id="modalTitle" class="modal-title"></h5>
+          <h5 id="modalTitle" class="modal-title d-flex align-items-center gap-2">
+            <img id="modalIcon" src="" alt="" style="width:28px;height:28px;display:none;">
+            <span id="modalTitleText"></span>
+          </h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
+        
         <div class="modal-body">
           <div class="row g-3">
             <div class="col-md-6">
@@ -323,14 +327,28 @@
 
   function showModal(key, meta){
     if(!modalEl) return alert("Bootstrap modal unavailable.");
-    document.getElementById('modalTitle').textContent = meta.title;
+
+    // Title text
+    document.getElementById('modalTitleText').textContent = meta.title;
+
+    // Handle icon
+    const iconEl = document.getElementById('modalIcon');
+    if(meta.icon){
+      iconEl.src = meta.icon;
+      iconEl.style.display = "inline-block";
+    } else {
+      iconEl.style.display = "none";
+    }
+
     document.getElementById('modalDesc').textContent = meta.desc;
     document.getElementById('modalValue').textContent = meta.value;
     document.getElementById('modalYaml').textContent = loadedYamlString || "No YAML loaded";
     document.getElementById('modalDiagram').textContent = "Workload > Subnets > LZ > NSP > LAW";
     document.getElementById('modalScript').textContent = `${meta.title} helps customers because ${meta.value.toLowerCase()}.`;
+
     modalEl.show();
   }
+
 
   function makeTile(key, meta, badge) {
     const el = document.createElement("div");
